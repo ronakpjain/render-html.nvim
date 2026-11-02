@@ -1,0 +1,94 @@
+*render-html.nvim*  Render inline HTML in Neovim buffers
+
+==============================================================================
+CONTENTS                                             *render-html-contents*
+
+  1. Introduction ................ |render-html-introduction|
+  2. Setup ....................... |render-html-setup|
+  3. Configuration ............... |render-html-config|
+  4. Commands .................... |render-html-commands|
+  5. Behavior .................... |render-html-behavior|
+  6. Limitations ................. |render-html-limitations|
+
+==============================================================================
+1. INTRODUCTION                                     *render-html-introduction*
+
+render-html.nvim hides inline HTML tags with extmarks, highlights their content
+and folds `<details>` blocks shut, in the spirit of render-markdown.nvim.
+
+It is aimed at markdown buffers that contain raw HTML, such as GitHub comments
+shown by guh.nvim.
+
+==============================================================================
+2. SETUP                                                 *render-html-setup*
+
+Using vim.pack: >lua
+  vim.pack.add({ "https://github.com/ronakpjain/render-html.nvim" },
+    { confirm = false, load = true })
+  require("render-html").setup()
+<
+
+Requires the `tree-sitter-html` parser and an injection query that maps markdown
+`html_block` nodes to the html language. nvim-treesitter ships that query; if it
+is missing, no HTML tree is produced and nothing is rendered.
+
+==============================================================================
+3. CONFIGURATION                                       *render-html-config*
+
+Default options: >lua
+  require("render-html").setup({
+    file_types = { markdown = true, pi = true, gitcommit = true },
+    keymap = false,
+    debounce = 120,
+    details = { fold = true },
+    fold = {
+      format = function(info)
+        return (" ▸ %s  ·  %d lines"):format(info.summary, info.lines)
+      end,
+    },
+    tags = { ... },
+  })
+<
+`file_types` is a set of filetypes to attach to.
+
+`keymap` is a buffer-local normal-mode key that toggles the `<details>` block
+containing the cursor. Anything else is passed through unchanged.
+
+`details.fold` enables the fold behavior. When false, no folds or fold options
+are created.
+
+`fold.format(info)` receives `{ summary, lines }` and returns the fold line.
+
+`tags` maps a tag name to a table with any of: `enabled`, `conceal`, `icon`,
+`highlight`, `content`, `pad`, `alt`. Unlisted tags are concealed with no
+styling. Pass `highlights = false` to skip creating the default highlight groups.
+
+==============================================================================
+4. COMMANDS                                           *render-html-commands*
+
+:RenderHtml [toggle]    Toggle rendering in the current buffer.
+:RenderHtml enable      Render the current buffer.
+:RenderHtml disable     Show raw HTML in the current buffer.
+:RenderHtml refresh     Re-parse and re-render the current buffer.
+
+==============================================================================
+5. BEHAVIOR                                           *render-html-behavior*
+
+The buffer's treesitter parser is parsed with injections and every html language
+tree is walked. Tags are concealed, content is highlighted, and `kbd`/`img`/`br`
+get inline virtual text.
+
+Each `<details>` range contributes a fold level, so nested blocks become nested
+folds. `foldtext` shows the summary text. Window options are saved and restored
+per window when the buffer leaves.
+
+Because `concealcursor` is empty, the cursor line always shows raw source.
+
+==============================================================================
+6. LIMITATIONS                                     *render-html-limitations*
+
+- Tags spanning multiple lines are not concealed.
+- HTML inside fenced code blocks is untouched.
+- `<pre>`, `<script>` and `<style>` content is not reformatted.
+
+ vim:tw=78:ts=8:noet:ft=help:norl:
