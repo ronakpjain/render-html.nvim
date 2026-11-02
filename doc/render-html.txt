@@ -63,6 +63,9 @@ are created.
 `highlight`, `content`, `pad`, `alt`. Unlisted tags are concealed with no
 styling. Pass `highlights = false` to skip creating the default highlight groups.
 
+Run `:checkhealth render-html` to verify the html parser, the markdown->html
+injection and the parser for each configured filetype.
+
 ==============================================================================
 4. COMMANDS                                           *render-html-commands*
 

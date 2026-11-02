@@ -101,6 +101,9 @@ Each tag accepts:
 Highlights are created with `default = true`, so a colorscheme loaded later can
 override them. Pass `highlights = false` to `setup()` to skip them entirely.
 
+Run `:checkhealth render-html` to verify the html parser, the markdown→html
+injection, and the parser for each configured filetype.
+
 ## Commands
 
 | Command               | Effect                                   |

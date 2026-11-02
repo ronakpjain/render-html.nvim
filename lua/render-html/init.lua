@@ -43,6 +43,11 @@ local function debounce(buf, fn)
 	)
 end
 
+---@return render-html.Config
+function M.config()
+	return state.config or config_mod.resolve(nil)
+end
+
 ---@param buf integer
 ---@return boolean
 function M.enabled(buf)
